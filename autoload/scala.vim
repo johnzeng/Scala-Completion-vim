@@ -2,11 +2,26 @@ func! scala#complete(findstart,base)
   if a:findstart
     let a:line = line(".")
     let a:col = col(".")
-    let a:bufFile = s:saveCurrentBuffer(a:line,a:col)
+    let buf = getline(a:line)
+    let a:tocomplete = a:col
+    for i in range(a:col)
+      "find dot
+      if buf[a:col - i] == '.'
+        let left = buf[0:a:col -i-1]
+        let right = buf[a:col:]
+        let buf = left.right
+        let a:tocomplete = a:col - i + 1
+        break
+      endif
+    endfor
+    let a:bufFile = s:saveCurrentBuffer(buf)
     let a:out = system('scalac -Xplugin:printer.jar -P:printMember:'.a:line.':'.a:col.' -nowarn '.a:bufFile)
     let a:outList = split(a:out , '\n')
+    if len(s:retList) < 2
+      return -1
+    endif
     let s:retList = a:outList[1:-2]
-    return a:col
+    return a:tocomplete
   else
     let a:retDicList = []
     for i in range(len(s:retList))
@@ -21,17 +36,9 @@ func! scala#complete(findstart,base)
   endif
 endfun
 
-function! s:saveCurrentBuffer(line,col)
+function! s:saveCurrentBuffer(lineBuf)
   let buf = getline(1, '$')
-  for i in range(a:col)
-    "find dot
-    if buf[a:line - 1][a:col - i] == '.'
-      let left = buf[a:line - 1][0:a:col -i-1]
-      let right = buf[a:line - 1][a:col:]
-      let buf[a:line - 1] = left.right
-      break
-    endif
-  endfor
+  let buf[line('.')] = a:lineBuf
   if &encoding != 'utf-8'
     let buf = map(buf, 'iconv(v:val, &encoding, "utf-8")')
   endif
