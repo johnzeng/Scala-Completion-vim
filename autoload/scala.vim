@@ -1,3 +1,7 @@
+let s:pluginPath = expand('<sfile>:p')
+let s:jarPathList = split(s:pluginPath, "/")[0:-2]
+let s:jarPath = "/".join(s:jarPathList, '/')."/../printer.jar"
+
 func! scala#complete(findstart,base)
   if a:findstart
     let a:line = line(".")
@@ -16,7 +20,7 @@ func! scala#complete(findstart,base)
       endif
     endfor
     let a:bufFile = s:saveCurrentBuffer(buf)
-    let a:out = system('scalac -Xplugin:printer.jar -P:printMember:'.a:line.':'.a:col.' -nowarn '.a:bufFile)
+    let a:out = system('scalac -Xplugin:'.s:jarPath.' -P:printMember:'.a:line.':'.a:col.' -nowarn '.a:bufFile)
     let a:outList = split(a:out , '\n')
     if len(a:outList) < 2
       return -1
