@@ -6,7 +6,7 @@ func! scala#complete(findstart,base)
     let a:out = system('scalac -Xplugin:printer.jar -P:printMember:'.a:line.':'.a:col.' -nowarn '.a:bufFile)
     let a:outList = split(a:out , '\n')
     let s:retList = a:outList[1:-2]
-    return 1
+    return a:col
   else
     let a:retDicList = []
     for i in range(len(s:retList))
