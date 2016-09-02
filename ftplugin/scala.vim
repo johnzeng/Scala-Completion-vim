@@ -1,4 +1,4 @@
-func ScalaComplete(findstart, base)
+func! ScalaComplete(findstart, base)
   return scala#complete(a:findstart,a:base)
 endfunc
 

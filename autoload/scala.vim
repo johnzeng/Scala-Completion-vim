@@ -5,23 +5,26 @@ func! scala#complete(findstart,base)
     let a:bufFile = s:saveCurrentBuffer(a:line,a:col)
     let a:out = system('scalac -Xplugin:printer.jar -P:printMember:'.a:line.':'.a:col.' -nowarn '.a:bufFile)
     let a:outList = split(a:out , '\n')
-    if len(a:outList) <= 2
-      return 0
-    endif
     let s:retList = a:outList[1:-2]
     return 1
   else
-    return {'words': s:retList, 'refresh': 'always'}
+    let a:retDicList = []
+    for i in range(len(s:retList))
+      let a:info = s:retList[i]
+      let a:word = matchstr(s:retList[i],"\.\*(" )
+      let a:shortWord = substitute(a:word, "\.\*def ","","")
+      let a:comWord = substitute(a:shortWord, "(","","")
+      let a:retDicList += [{'word':a:comWord, 'abbr':a:info, 'info':a:info}]
+    endfor
+    echom a:retDicList[0]['word']
+    return {'words': a:retDicList, 'refresh': 'always'}
   endif
-
 endfun
 
 function! s:saveCurrentBuffer(line,col)
   let buf = getline(1, '$')
   for i in range(a:col)
     "find dot
-    echom "i is ".i.",col is ".a:col
-    echom "buf[a:line - 1][a:col - i] is:".buf[a:line - 1][a:col - i]
     if buf[a:line - 1][a:col - i] == '.'
       let left = buf[a:line - 1][0:a:col -i-1]
       let right = buf[a:line - 1][a:col:]
@@ -29,7 +32,6 @@ function! s:saveCurrentBuffer(line,col)
       break
     endif
   endfor
-  echom buf[a:line - 1]
   if &encoding != 'utf-8'
     let buf = map(buf, 'iconv(v:val, &encoding, "utf-8")')
   endif
@@ -43,5 +45,3 @@ function! s:saveCurrentBuffer(line,col)
 
   return file
 endfunction
-
-
