@@ -14,7 +14,6 @@ func! scala#complete(findstart,base)
         let a:left = a:buf[0 : a:col -i-1]
         let a:right = a:buf[a:col :]
         let a:buf = a:left.a:right
-        echom a:buf
         let a:tocomplete = a:col - i + 1
         break
       endif
@@ -23,30 +22,44 @@ func! scala#complete(findstart,base)
     let a:out = system('scalac -Xplugin:'.s:jarPath.' -P:printMember:'.a:line.':'.a:col.' -nowarn '.a:bufFile)
     let a:outList = split(a:out , '\n')
     if len(a:outList) < 2
+      "this means gettting error
       return -1
     endif
-    let s:retList = a:outList[1:-2]
+    if match(a:outList[0],'asldfkjaslfdlfd') == -1
+      "this means gettting error
+      return -1
+    endif
+    let s:retList = a:outList[2:-2]
     return a:tocomplete
   else
     let a:retDicList = []
     for i in range(len(s:retList))
       let a:info = s:retList[i]
-      let a:shortWord = substitute(a:info, "\.\*def ","","")
+      let a:shortWord = substitute(a:info, "\\s\*val\\s\*","", "")
+      let a:shortWord = substitute(a:shortWord, "\\s\*final\\s\*","","")
+      let a:shortWord = substitute(a:shortWord, "\\s\*package\\s\*","","")
+      let a:shortWord = substitute(a:shortWord, "\\s\*class\\s\*","","")
+      let a:shortWord = substitute(a:shortWord, "\\s\*object\\s\*","","")
+      let a:shortWord = substitute(a:shortWord, "\\s\*def\\s\*","","")
+      let a:shortWord = substitute(a:shortWord, "\\s\*extend\\s\*","","")
+      let a:shortWord = substitute(a:shortWord, "[\s;]","","g")
+
       let a:comWord = substitute(a:shortWord, "\[(:\].*","","")
-      echom 'word:'.a:comWord
+      if match(a:info, "\\s\*private") == 0
+        continue
+      endi
       if a:comWord =~ '^'.a:base
+        echom "in add".a:base
         let a:retDicList += [{'word':a:comWord, 'abbr':a:comWord, 'info':a:info}]
       endif
     endfor
-    echom a:retDicList[0]['word']
-    return {'words': a:retDicList, 'refresh': 'always'}
+    return a:retDicList
   endif
 endfun
 
 function! s:saveCurrentBuffer(lineBuf)
   let a:buf = getline(1, '$')
   let a:buf[line('.') - 1] = a:lineBuf
-  echom a:buf[line('.') -1]
   if &encoding != 'utf-8'
     let a:buf = map(a:buf, 'iconv(v:val, &encoding, "utf-8")')
   endif

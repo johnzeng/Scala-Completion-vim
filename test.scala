@@ -4,6 +4,7 @@ class MyTest{
   def hello() = "hello"
   def getNohello() = "hello"
   def newget() = "new"
+  var hi = "123"
 }
 
 object Test {
@@ -14,6 +15,8 @@ object Test {
   hello.getNohello
   hello.hello
   hello.newget
-
+  
+  
 }
+
 
