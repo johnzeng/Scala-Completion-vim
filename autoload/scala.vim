@@ -23,11 +23,13 @@ func! scala#complete(findstart,base)
     let a:outList = split(a:out , '\n')
     if len(a:outList) < 2
       "this means gettting error
-      return -1
+      echom a:out
+      return -3
     endif
     if match(a:outList[0],'asldfkjaslfdlfd') == -1
       "this means gettting error
-      return -1
+      echom a:out
+      return -3
     endif
     let s:retList = a:outList[2:-2]
     return a:tocomplete
@@ -35,6 +37,10 @@ func! scala#complete(findstart,base)
     let a:retDicList = []
     for i in range(len(s:retList))
       let a:info = s:retList[i]
+      if match(a:info, "\^\\s\*private") == 0 || match(a:info, "\^\\s\*protected") == 0
+        continue
+      endi
+
       let a:shortWord = substitute(a:info, "\\s\*val\\s\*","", "")
       let a:shortWord = substitute(a:shortWord, "\\s\*final\\s\*","","")
       let a:shortWord = substitute(a:shortWord, "\\s\*package\\s\*","","")
@@ -42,14 +48,10 @@ func! scala#complete(findstart,base)
       let a:shortWord = substitute(a:shortWord, "\\s\*object\\s\*","","")
       let a:shortWord = substitute(a:shortWord, "\\s\*def\\s\*","","")
       let a:shortWord = substitute(a:shortWord, "\\s\*extend\\s\*","","")
-      let a:shortWord = substitute(a:shortWord, "[\s;]","","g")
+      let a:shortWord = substitute(a:shortWord, "[ ;\\s]","","g")
 
       let a:comWord = substitute(a:shortWord, "\[(:\].*","","")
-      if match(a:info, "\\s\*private") == 0
-        continue
-      endi
       if a:comWord =~ '^'.a:base
-        echom "in add".a:base
         let a:retDicList += [{'word':a:comWord, 'abbr':a:comWord, 'info':a:info}]
       endif
     endfor
