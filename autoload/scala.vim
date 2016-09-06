@@ -1,6 +1,8 @@
 let s:pluginPath = expand('<sfile>:p')
 let s:jarPathList = split(s:pluginPath, "/")[0:-2]
 let s:jarPath = "/".join(s:jarPathList, '/')."/../printer.jar"
+"let s:serverState = system('python ./python/server.py&')
+"echom s:serverState
 
 func! scala#complete(findstart,base)
   if a:findstart

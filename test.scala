@@ -1,5 +1,5 @@
 import java.util.UUID.Holder
-import java.util.prefs.Bae64
+import java.util.prefs
 
 class MyTest{
   def hello() = "hello"
