@@ -21,7 +21,9 @@ func! scala#complete(findstart,base)
       endif
     endfor
     let a:bufFile = s:saveCurrentBuffer(a:buf)
-    let a:out = system('scalac -Xplugin:'.s:jarPath.' -P:printMember:'.a:line.':'.a:col.' -nowarn '.a:bufFile)
+"    let a:out = system('scalac -Xplugin:'.s:jarPath.' -P:printMember:'.a:line.':'.a:col.' -nowarn '.a:bufFile)
+    pyfile ./python/client.py
+    echom a:out
     let a:outList = split(a:out , '\n')
     if len(a:outList) < 2
       "this means gettting error

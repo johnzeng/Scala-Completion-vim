@@ -22,7 +22,7 @@ class CompilerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         originalname = q['oname'][0]
 
-        cmd = ['scalac', '-Xplugin:/Users/john/.vim/bundle/Scala-Completion-vim/printer.jar', '-P:printMember:%s:%s' %(q['line'][0],q['col'][0]) , '-nowarn','/Users/john/.vim/bundle/Scala-Completion-vim/%s' % q['filename'][0]]
+        cmd = ['scalac', '-Xplugin:/Users/john/.vim/bundle/Scala-Completion-vim/printer.jar', '-P:printMember:%s:%s' %(q['line'][0],q['col'][0]) , '-nowarn', q['filename'][0]]
         print cmd
         p = sub.Popen(cmd,stdout=sub.PIPE,stderr=sub.PIPE)
         output, errors = p.communicate()

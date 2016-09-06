@@ -6,6 +6,7 @@ class MyTest{
   def getNohello() = "hello"
   def newget() = "new"
   var hi = "123"
+  hi
 }
 
 object Test {
