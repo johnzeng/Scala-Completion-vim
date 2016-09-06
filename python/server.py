@@ -31,6 +31,7 @@ class CompilerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             s.send_response(500)
             s.send_header("Content-type", "text/plain")
             s.end_headers()
+            print errors
             s.wfile.write(errors)
         else:
             s.send_response(200)
@@ -40,12 +41,17 @@ class CompilerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-    server_class = BaseHTTPServer.HTTPServer
-    httpd = server_class((HOST_NAME, PORT_NUMBER), CompilerHandler)
-    print time.asctime(), "Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER)
     try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    httpd.server_close()
-    print time.asctime(), "Server Stops - %s:%s" % (HOST_NAME, PORT_NUMBER)
+        request = urllib2.urlopen("http://localhost:8000/ping")
+        rsp = request.read()
+
+    except :
+        server_class = BaseHTTPServer.HTTPServer
+        httpd = server_class((HOST_NAME, PORT_NUMBER), CompilerHandler)
+        print time.asctime(), "Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER)
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            pass
+        httpd.server_close()
+        print time.asctime(), "Server Stops - %s:%s" % (HOST_NAME, PORT_NUMBER)

@@ -1,8 +1,17 @@
 let s:pluginPath = expand('<sfile>:p')
 let s:jarPathList = split(s:pluginPath, "/")[0:-2]
 let s:jarPath = "/".join(s:jarPathList, '/')."/../printer.jar"
-"let s:serverState = system('python ./python/server.py&')
-"echom s:serverState
+let s:serverState = system('python ./python/server.py&')
+
+imap . <C-r>=scala#precompile()<CR>
+func! scala#precompile()
+    let a:line = line(".")
+    let a:col = col(".")
+    let a:buf = getline(a:line)
+    let a:bufFile = s:saveCurrentBuffer(a:buf)
+    pyfile ./python/client.py
+    return '.'
+endfunc
 
 func! scala#complete(findstart,base)
   if a:findstart
@@ -21,9 +30,7 @@ func! scala#complete(findstart,base)
       endif
     endfor
     let a:bufFile = s:saveCurrentBuffer(a:buf)
-"    let a:out = system('scalac -Xplugin:'.s:jarPath.' -P:printMember:'.a:line.':'.a:col.' -nowarn '.a:bufFile)
     pyfile ./python/client.py
-    echom a:out
     let a:outList = split(a:out , '\n')
     if len(a:outList) < 2
       "this means gettting error

@@ -9,9 +9,15 @@ params={
         "oname":"test",
         }
 paramsStr = urllib.urlencode(params)
-request = urllib2.urlopen("http://localhost:8000/?%s" % paramsStr)
 
-rsp = request.read()
+try:
+    request = urllib2.urlopen("http://localhost:8000/?%s" % paramsStr)
+    rsp = request.read()
+    vim.command("let a:out= '%s'" % rsp)
+except urllib2.HTTPError, err:
+    if err.code == 500:
+        vim.command("let a:out = '%s'"% err.reason)
 
-print rsp
-vim.command("let a:out= '%s'" % rsp)
+except urllib2.URLError, err:
+    pass
+
