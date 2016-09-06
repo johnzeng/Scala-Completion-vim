@@ -1,4 +1,4 @@
-import java.util.UUID.Holder
+import java.util
 import java.util.prefs
 
 class MyTest{

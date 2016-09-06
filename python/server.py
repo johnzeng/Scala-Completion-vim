@@ -20,16 +20,24 @@ class CompilerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         pret = urlparse.urlparse(s.path)
         q = urlparse.parse_qs(pret.query)
 
-        p = sub.Popen(['scalac', '-Xplugin:/Users/john/.vim/bundle/Scala-Completion-vim/printer.jar', '-P:printMember:1:5' , '-nowarn','/Users/john/.vim/bundle/Scala-Completion-vim/test.scala'],stdout=sub.PIPE,stderr=sub.PIPE)
+        originalname = q['oname'][0]
+
+        cmd = ['scalac', '-Xplugin:/Users/john/.vim/bundle/Scala-Completion-vim/printer.jar', '-P:printMember:%s:%s' %(q['line'][0],q['col'][0]) , '-nowarn','/Users/john/.vim/bundle/Scala-Completion-vim/%s' % q['filename'][0]]
+        print cmd
+        p = sub.Popen(cmd,stdout=sub.PIPE,stderr=sub.PIPE)
         output, errors = p.communicate()
 
-        print output
-        print errors
-        
-        s.send_response(200)
-        s.send_header("Content-type", "text/plain")
-        s.end_headers()
-        s.wfile.write("hello")
+        if "" != errors:
+            s.send_response(500)
+            s.send_header("Content-type", "text/plain")
+            s.end_headers()
+            s.wfile.write(errors)
+        else:
+            s.send_response(200)
+            s.send_header("Content-type", "text/plain")
+            s.end_headers()
+            s.wfile.write(output)
+
 
 if __name__ == '__main__':
     server_class = BaseHTTPServer.HTTPServer
