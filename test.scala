@@ -1,4 +1,4 @@
-import java.util
+import java.util.spi
 import java.util.prefs
 
 class MyTest{

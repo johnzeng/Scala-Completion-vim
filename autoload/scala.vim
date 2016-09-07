@@ -6,7 +6,7 @@ let s:serverState = system('python ./python/server.py&')
 imap . <C-r>=scala#precompile()<CR>
 func! scala#precompile()
     let a:line = line(".")
-    let a:col = col(".")
+    let a:tocomplete = col(".")
     let a:buf = getline(a:line)
     let a:bufFile = s:saveCurrentBuffer(a:buf)
     pyfile ./python/client.py
@@ -52,14 +52,14 @@ func! scala#complete(findstart,base)
         continue
       endi
 
-      let a:shortWord = substitute(a:info, "\\s\*val\\s\*","", "")
-      let a:shortWord = substitute(a:shortWord, "\\s\*final\\s\*","","")
-      let a:shortWord = substitute(a:shortWord, "\\s\*package\\s\*","","")
-      let a:shortWord = substitute(a:shortWord, "\\s\*class\\s\*","","")
-      let a:shortWord = substitute(a:shortWord, "\\s\*object\\s\*","","")
-      let a:shortWord = substitute(a:shortWord, "\\s\*def\\s\*","","")
-      let a:shortWord = substitute(a:shortWord, "\\s\*extend\\s\*","","")
-      let a:shortWord = substitute(a:shortWord, "[ ;\\s]","","g")
+      let a:shortWord = substitute(a:info, "val ","", "")
+      let a:shortWord = substitute(a:shortWord, "final ","","")
+      let a:shortWord = substitute(a:shortWord, "package ","","")
+      let a:shortWord = substitute(a:shortWord, "class ","","")
+      let a:shortWord = substitute(a:shortWord, "object ","","")
+      let a:shortWord = substitute(a:shortWord, "def ","","")
+      let a:shortWord = substitute(a:shortWord, "extend ","","")
+      let a:shortWord = substitute(a:shortWord, "[ ;]","","g")
 
       let a:comWord = substitute(a:shortWord, "\[(:\].*","","")
       if a:comWord =~ '^'.a:base

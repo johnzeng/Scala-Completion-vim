@@ -2,9 +2,37 @@ import time
 import BaseHTTPServer
 import urlparse
 import subprocess as sub
+import threading
 
 HOST_NAME = 'localhost' # !!!REMEMBER TO CHANGE THIS!!!
 PORT_NUMBER = 8000 # Maybe set this to 9000.
+
+#ret map will map from original file name to result string
+retMap = {}
+
+class Worker(threading.Thread):
+    def __init__(s,line,col,filename,orgname):
+        threading.Thread.__init__(s)
+        s.line = line
+        s.col = col
+        s.filename = filename
+        s.oname = orgname
+
+    def run(s):
+        cmd = ['scalac', '-Xplugin:/Users/john/.vim/bundle/Scala-Completion-vim/printer.jar', '-P:printMember:%s:%s' %(s.line,s.col) , '-nowarn', s.filename]
+        print cmd
+        p = sub.Popen(cmd,stdout=sub.PIPE,stderr=sub.PIPE)
+        output, errors = p.communicate()
+        ret = {}
+        if errors != "":
+            ret['code'] = 500
+            ret['body'] = errors
+        else:
+            ret['code'] = 200
+            ret['body'] = output
+        global retMap
+        retMap = {}
+        retMap["%s:%s:%s"%(s.oname, s.line, s.col)] = ret
 
 
 class CompilerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -20,24 +48,26 @@ class CompilerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         pret = urlparse.urlparse(s.path)
         q = urlparse.parse_qs(pret.query)
 
-        originalname = q['oname'][0]
+        line = q['line'][0]
+        col = q['col'][0]
+        filename = q['filename'][0]
+        oname = q['oname'][0]
 
-        cmd = ['scalac', '-Xplugin:/Users/john/.vim/bundle/Scala-Completion-vim/printer.jar', '-P:printMember:%s:%s' %(q['line'][0],q['col'][0]) , '-nowarn', q['filename'][0]]
-        print cmd
-        p = sub.Popen(cmd,stdout=sub.PIPE,stderr=sub.PIPE)
-        output, errors = p.communicate()
-
-        if "" != errors:
-            s.send_response(500)
+        print retMap
+        key ="%s:%s:%s"%(oname, line, col) 
+        if key in retMap:
+            ret = retMap[key]
+            s.send_response(ret['code'])
             s.send_header("Content-type", "text/plain")
             s.end_headers()
-            print errors
-            s.wfile.write(errors)
+            s.wfile.write(ret['body'])
         else:
+            newT = Worker(line,col,filename, oname)
+            newT.start()
             s.send_response(200)
             s.send_header("Content-type", "text/plain")
             s.end_headers()
-            s.wfile.write(output)
+            s.wfile.write("")
 
 
 if __name__ == '__main__':

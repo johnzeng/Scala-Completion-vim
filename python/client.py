@@ -4,7 +4,7 @@ import vim
 
 params={
         "line":vim.eval('a:line'),
-        "col":vim.eval('a:col'),
+        "col":vim.eval('a:tocomplete'),
         "filename":vim.eval('a:bufFile'),
         "oname":"test",
         }
