@@ -9,6 +9,7 @@ PORT_NUMBER = 8000 # Maybe set this to 9000.
 
 #ret map will map from original file name to result string
 retMap = {}
+working = ""
 
 class Worker(threading.Thread):
     def __init__(s,line,col,filename,orgname):
@@ -43,6 +44,13 @@ class CompilerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_POST(s):
         pass
 
+    def getRet(s,key):
+        ret = retMap[key]
+        s.send_response(ret['code'])
+        s.send_header("Content-type", "text/plain")
+        s.end_headers()
+        s.wfile.write(ret['body'])
+
     def do_GET(s):
         """Respond to a GET request."""
         pret = urlparse.urlparse(s.path)
@@ -56,12 +64,14 @@ class CompilerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         print retMap
         key ="%s:%s:%s"%(oname, line, col) 
         if key in retMap:
-            ret = retMap[key]
-            s.send_response(ret['code'])
-            s.send_header("Content-type", "text/plain")
-            s.end_headers()
-            s.wfile.write(ret['body'])
+            s.getRet(key)
         else:
+            if working == key:
+                while key not in retMap:
+                    time.sleep(0.01)
+                s.getRet(key)
+            global working
+            working = key
             newT = Worker(line,col,filename, oname)
             newT.start()
             s.send_response(200)

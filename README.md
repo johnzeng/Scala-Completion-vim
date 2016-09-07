@@ -1,9 +1,7 @@
 # Scala-Completion-vim
 Still very buggy scala vim completion plugin based on [Scala-completion-base](https://github.com/johnzeng/Scala-completion-Base)
 
-It's working now, but, ahh, yet very slow. It's cased by compiler invoking, so I don't have any idea so far. I think it will help if I make a Server-Client architecture for it. But it's not necessary so far.
-
-I think this will be enough for you when you don't know what APIs do you have when you are facing a strange package
+Client-Server Arch completion plugin. It's not working fine now because it will spend lots of time to wait until the compile is finished.
 
 
 # Currently supported feature
@@ -13,5 +11,8 @@ I think this will be enough for you when you don't know what APIs do you have wh
 # need to be supported
 - third party jar lib including.
 - (maybe) sbt support.
-- (maybe) CS architecture to boost the plugin.
+- ~~(maybe) CS architecture to boost the plugin.~~
+
+# known limit
+- Can not do completion if the file is not compilable. So `import java` is not going to give any completion because this will throw an exception when you do compile 
 
