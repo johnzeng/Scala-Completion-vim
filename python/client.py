@@ -3,8 +3,10 @@ import urllib
 import vim
 
 params={
+        "completeLine":vim.eval('a:completeLine'),
+        "completeCol":vim.eval('a:completeCol'),
         "line":vim.eval('a:line'),
-        "col":vim.eval('a:tocomplete'),
+        "col":vim.eval('a:col'),
         "filename":vim.eval('a:bufFile'),
         "oname":"test",
         }

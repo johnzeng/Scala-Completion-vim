@@ -1,4 +1,4 @@
-import java.util.spi
+import java.util.spi.TimeZoneNameProvider
 import java.util.prefs
 
 class MyTest{
@@ -6,7 +6,9 @@ class MyTest{
   def getNohello() = "hello"
   def newget() = "new"
   var hi = "123"
-  hi
+  
+  hi.contains("123")
+  
 }
 
 object Test {
@@ -17,8 +19,7 @@ object Test {
   hello.getNohello
   hello.hello
   hello.newget
-  
-  
+  val b = Seq(1,1)
+  val c = b.map(a => a+1)
+ 
 }
-
-

@@ -1,3 +1,24 @@
+import logging  
+import logging.handlers  
+import sys
+
+f = open('./server.log', 'w+')
+handler = logging.StreamHandler(f)
+fmt = '%(asctime)s |%(filename)s:%(lineno)s |%(name)s :%(message)s'  
+  
+formatter = logging.Formatter(fmt)
+handler.setFormatter(formatter)
+  
+logger = logging.getLogger('server')
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG) 
+
+def getLogger():
+    return logger
+
+def setLoggerLevel(level):
+    logger.setLoggerLevel(level)
+    
 import time
 import BaseHTTPServer
 import urlparse
@@ -12,28 +33,32 @@ retMap = {}
 working = ""
 
 class Worker(threading.Thread):
-    def __init__(s,line,col,filename,orgname):
+    def __init__(s,line,col,aliaLine, aliaCol,filename,orgname):
         threading.Thread.__init__(s)
         s.line = line
         s.col = col
+        s.aliaLine = aliaLine
+        s.aliaCol = aliaCol
         s.filename = filename
         s.oname = orgname
 
     def run(s):
         cmd = ['scalac', '-Xplugin:/Users/john/.vim/bundle/Scala-Completion-vim/printer.jar', '-P:printMember:%s:%s' %(s.line,s.col) , '-nowarn', s.filename]
-        print cmd
         p = sub.Popen(cmd,stdout=sub.PIPE,stderr=sub.PIPE)
         output, errors = p.communicate()
         ret = {}
         if errors != "":
-            ret['code'] = 500
+            ret['code'] = 400
             ret['body'] = errors
         else:
             ret['code'] = 200
             ret['body'] = output
         global retMap
         retMap = {}
-        retMap["%s:%s:%s"%(s.oname, s.line, s.col)] = ret
+        key1 ="%s:%s:%s"%(s.oname, s.line, s.col)
+        key2 ="%s:%s:%s"%(s.oname, s.aliaLine, s.aliaCol)
+        retMap[key1] = ret
+        retMap[key2] = ret
 
 
 class CompilerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -58,11 +83,16 @@ class CompilerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         line = q['line'][0]
         col = q['col'][0]
+        completeLine = q['completeLine'][0]
+        completeCol = q['completeCol'][0]
         filename = q['filename'][0]
         oname = q['oname'][0]
 
-        print retMap
-        key ="%s:%s:%s"%(oname, line, col) 
+        global working
+        key1 ="%s:%s:%s"%(oname, line, col)
+        key2 ="%s:%s:%s"%(oname, completeLine, completeCol)
+        key = key1
+        
         if key in retMap:
             s.getRet(key)
         else:
@@ -70,9 +100,8 @@ class CompilerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 while key not in retMap:
                     time.sleep(0.01)
                 s.getRet(key)
-            global working
             working = key
-            newT = Worker(line,col,filename, oname)
+            newT = Worker(completeLine, completeCol,line,col,filename, oname)
             newT.start()
             s.send_response(200)
             s.send_header("Content-type", "text/plain")
@@ -88,10 +117,11 @@ if __name__ == '__main__':
     except :
         server_class = BaseHTTPServer.HTTPServer
         httpd = server_class((HOST_NAME, PORT_NUMBER), CompilerHandler)
-        print time.asctime(), "Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER)
+        logger.debug("Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER))
+        
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
             pass
         httpd.server_close()
-        print time.asctime(), "Server Stops - %s:%s" % (HOST_NAME, PORT_NUMBER)
+        logger.debug("Server Stop - %s:%s" % (HOST_NAME, PORT_NUMBER))
