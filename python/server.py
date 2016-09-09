@@ -30,7 +30,7 @@ PORT_NUMBER = 8000 # Maybe set this to 9000.
 
 #ret map will map from original file name to result string
 retMap = {}
-working = ""
+working = set([""])
 
 class Worker(threading.Thread):
     def __init__(s,line,col,aliaLine, aliaCol,filename,orgname):
@@ -69,8 +69,17 @@ class CompilerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_POST(s):
         pass
 
-    def getRet(s,key):
-        ret = retMap[key]
+    def getRet(s,key1,key2):
+        ret = {}
+        if key1 in retMap:
+            ret = retMap[key1]
+            retMap[key2] = ret
+        elif key2 in retMap:
+            ret = retMap[key2]
+            retMap[key1] = ret
+        else:
+            ret['code'] = 400
+            ret['body'] = "error from server"
         s.send_response(ret['code'])
         s.send_header("Content-type", "text/plain")
         s.end_headers()
@@ -91,16 +100,18 @@ class CompilerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         global working
         key1 ="%s:%s:%s"%(oname, line, col)
         key2 ="%s:%s:%s"%(oname, completeLine, completeCol)
-        key = key1
+
         
-        if key in retMap:
-            s.getRet(key)
+        if key1 in retMap or key2 in retMap:
+            s.getRet(key1,key2)
         else:
-            if working == key:
-                while key not in retMap:
+            if key1 in working or key2 in working:
+                while key1 not in retMap and key2 not in retMap:
                     time.sleep(0.01)
-                s.getRet(key)
-            working = key
+                s.getRet(key1,key2)
+                working = set([])
+                return
+            working = set([key1,key2])
             newT = Worker(completeLine, completeCol,line,col,filename, oname)
             newT.start()
             s.send_response(200)

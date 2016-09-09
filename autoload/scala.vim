@@ -70,6 +70,7 @@ func! scala#complete(findstart,base)
       let a:shortWord = substitute(a:shortWord, "object ","","")
       let a:shortWord = substitute(a:shortWord, "def ","","")
       let a:shortWord = substitute(a:shortWord, "extend ","","")
+      let a:shortWord = substitute(a:shortWord, "override ","","")
       let a:shortWord = substitute(a:shortWord, "[ ;]","","g")
 
       let a:comWord = substitute(a:shortWord, "\[(:\].*","","")
