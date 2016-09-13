@@ -1,4 +1,5 @@
-func! scala#precompile()
+func! scala#precompile(input)
+  if a:input == '.'
     let a:line = line(".")
     let a:col = col(".")
     let a:buf = getline(a:line)
@@ -9,6 +10,21 @@ func! scala#precompile()
     execute 'pyfile '.g:clientPath
     let a:ret = cursor(a:line,a:col)
     return '.'
+  elseif a:input == ' '
+    echom 'space'
+    let a:line = line(".")
+    let a:col = col(".")
+    let a:buf = getline(a:line)
+    exec 'normal f '
+    let a:completeLine = line(".")
+    let a:completeCol = col(".")
+    echom "col is :".a:completeCol
+    let a:bufFile = s:saveCurrentBuffer(a:buf)
+    execute 'pyfile '.g:clientPath
+    let a:ret = cursor(a:line,a:col)
+    return ' '
+  endif
+    
 endfunc
 
 func! scala#complete(findstart,base)
@@ -16,17 +32,22 @@ func! scala#complete(findstart,base)
     let a:line = line(".")
     let a:col = col(".")
     let a:buf = getline(a:line)
-    for i in range(a:col)
-      "find dot
-      if a:buf[a:col - i] == '.'
-        let a:left = a:buf[0 : a:col -i-1]
-        let a:right = a:buf[a:col :]
-        let a:buf = a:left.a:right
-        let a:completeCol = a:col - i + 1
-        let a:completeLine = a:line
-        break
-      endif
-    endfor
+    let a:completeCol = a:col - 1
+    let a:completeLine = a:line
+    if a:buf[a:col - 1] != ' '
+      "don't search for dot if the last command is space
+      for i in range(a:col)
+        "find dot
+        if a:buf[a:col - i] == '.'
+          let a:left = a:buf[0 : a:col -i-1]
+          let a:right = a:buf[a:col :]
+          let a:buf = a:left.a:right
+          let a:completeCol = a:col - i + 1
+          let a:completeLine = a:line
+          break
+        endif
+      endfor
+    endif
     let a:bufFile = s:saveCurrentBuffer(a:buf)
     execute 'pyfile '.g:clientPath
     let a:outList = split(a:out , '\n')

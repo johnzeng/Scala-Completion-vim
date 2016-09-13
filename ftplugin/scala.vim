@@ -18,7 +18,9 @@ endfunc
 
 call SetupServer()
 
-imap . <C-r>=scala#precompile()<CR>
+imap . <C-r>=scala#precompile('.')<CR>
+ino <Space> <Esc>
+"imap <Space> <C-r>=scala#precompile(' ')<CR>
 func! ScalaComplete(findstart, base)
   return scala#complete(a:findstart,a:base)
 endfunc

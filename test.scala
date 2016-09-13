@@ -37,5 +37,6 @@ object Test {
 //  claims.put("iat", iat)
 
   val jwt = signer.sign(claims)
+  val test = 1 to 100  
  
 }
