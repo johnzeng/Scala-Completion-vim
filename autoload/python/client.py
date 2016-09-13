@@ -42,7 +42,7 @@ else:
         if err.code == 400:
             error_message = err.read()
             if "" != error_message:
-                vim.command("let a:out = '%s'" % error_message.replace("'", ""))
+                vim.command("let a:out = '%s'" % error_message.replace("'", "`"))
             else:
                 vim.command("let a:out='%s'" % err.reason)
 
