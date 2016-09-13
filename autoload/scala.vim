@@ -73,7 +73,7 @@ func! scala#complete(findstart,base)
       let a:shortWord = substitute(a:shortWord, "override ","","")
       let a:shortWord = substitute(a:shortWord, "[ ;]","","g")
 
-      let a:comWord = substitute(a:shortWord, "\[(:\].*","","")
+      let a:comWord = substitute(a:shortWord, "\[[(:\].*","","")
       if a:comWord =~ '^'.a:base
         call add(a:retDicList,{'word':a:comWord, 'abbr':a:comWord, 'info':a:info})
       endif
