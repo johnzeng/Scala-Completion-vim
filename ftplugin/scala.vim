@@ -1,8 +1,9 @@
 let s:pluginPath = expand('<sfile>:p')
-let s:printerPathList = split(s:pluginPath, "/")[0:-2]
-let s:printerPath = "/".join(s:jarPathList, '/')."/printer.jar"
+let s:pluginPath = join(split(s:pluginPath, "/")[0:-3], '/')
+let s:printerPath = "/".s:pluginPath."/autoload/printer.jar"
 "start the server from 
-let s:serverState = system('python '.s:pluginPath.'/python/server.py&')
+let s:serverState = system('python /'.s:pluginPath.'/autoload/python/server.py&')
+let g:clientPath = '/'.s:pluginPath."/autoload/python/client.py"
 "set infercase
 
 if !exists('g:scala_jar_list')
@@ -12,7 +13,7 @@ endif
 func! SetupServer()
   let a:isSetup=1
   let a:pyfilePath = s:pluginPath.''
-  pyfile ./autoload/python/client.py
+  exec 'pyfile '.g:clientPath
 endfunc
 
 call SetupServer()

@@ -2,7 +2,7 @@ import urllib2
 import urllib
 import vim
 
-isSetup = vim.eval('a:isSetup')
+isSetup = vim.eval('exists("a:isSetup")')
 if isSetup == '1':
     params={
             "printer":vim.eval('s:printerPath'),
@@ -31,12 +31,17 @@ else:
     paramsStr = urllib.urlencode(params)
 
     try:
+        vim.command("echom 'now open url'")
         request = urllib2.urlopen("http://localhost:8000/?%s" % paramsStr)
+        vim.command("echom 'now read url'")
         rsp = request.read()
+        vim.command("echom 'now rsp is:%s'" % rsp)
         vim.command("let a:out= '%s'" % rsp)
+        vim.command("echom a:out")
     except urllib2.HTTPError, err:
-        if err.code == 500:
-            vim.command("let a:out = '%s'"% err.reason)
+        if err.code == 400:
+            error_message = err.read()
+            vim.command("let a:out = '%s'"% error_message)
 
     except urllib2.URLError, err:
         pass

@@ -6,7 +6,7 @@ func! scala#precompile()
     let a:completeLine = line(".")
     let a:completeCol = col(".")
     let a:bufFile = s:saveCurrentBuffer(a:buf)
-    pyfile ./python/client.py
+    execute 'pyfile '.g:clientPath
     let a:ret = cursor(a:line,a:col)
     return '.'
 endfunc
@@ -28,7 +28,7 @@ func! scala#complete(findstart,base)
       endif
     endfor
     let a:bufFile = s:saveCurrentBuffer(a:buf)
-    pyfile python/client.py
+    execute 'pyfile '.g:clientPath
     let a:outList = split(a:out , '\n')
     if len(a:outList) < 2
       "this means gettting error

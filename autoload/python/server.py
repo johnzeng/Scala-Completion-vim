@@ -2,7 +2,7 @@ import logging
 import logging.handlers  
 import sys
 
-f = open('./server.log', 'w+')
+f = open('/tmp/ScalaComplete.log', 'w+')
 handler = logging.StreamHandler(f)
 fmt = '%(asctime)s |%(filename)s:%(lineno)s |%(name)s :%(message)s'  
   
@@ -51,7 +51,8 @@ class Worker(threading.Thread):
             for i in jarPaths:
                 append(s.classPath, '--classpath %s' % i)
 
-        cmd = ['scalac', s.classPath[:], '-Xplugin:%s' % printerPath, '-P:printMember:%s:%s' %(s.line,s.col) , '-nowarn', s.filename]
+        cmd = ['scalac'] + s.classPath[:] +['-Xplugin:%s' % printerPath, '-P:printMember:%s:%s' %(s.line,s.col) , '-nowarn', s.filename]
+        logger.debug(cmd)
         p = sub.Popen(cmd,stdout=sub.PIPE,stderr=sub.PIPE)
         output, errors = p.communicate()
         ret = {}
