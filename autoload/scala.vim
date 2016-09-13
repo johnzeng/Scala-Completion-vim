@@ -28,7 +28,7 @@ func! scala#complete(findstart,base)
       endif
     endfor
     let a:bufFile = s:saveCurrentBuffer(a:buf)
-    pyfile ./python/client.py
+    pyfile python/client.py
     let a:outList = split(a:out , '\n')
     if len(a:outList) < 2
       "this means gettting error
