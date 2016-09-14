@@ -1,29 +1,14 @@
 func! scala#precompile(input)
-  if a:input == '.'
-    let a:line = line(".")
-    let a:col = col(".")
-    let a:buf = getline(a:line)
-    exec 'normal %'
-    let a:completeLine = line(".")
-    let a:completeCol = col(".")
-    let a:bufFile = s:saveCurrentBuffer(a:buf)
-    execute 'pyfile '.g:clientPath
-    let a:ret = cursor(a:line,a:col)
-    return '.'
-  elseif a:input == ' '
-    echom 'space'
-    let a:line = line(".")
-    let a:col = col(".")
-    let a:buf = getline(a:line)
-    exec 'normal f '
-    let a:completeLine = line(".")
-    let a:completeCol = col(".")
-    echom "col is :".a:completeCol
-    let a:bufFile = s:saveCurrentBuffer(a:buf)
-    execute 'pyfile '.g:clientPath
-    let a:ret = cursor(a:line,a:col)
-    return ' '
-  endif
+  let a:line = line(".")
+  let a:col = col(".")
+  let a:buf = getline(a:line)
+  exec 'normal %'
+  let a:completeLine = line(".")
+  let a:completeCol = col(".")
+  let a:bufFile = s:saveCurrentBuffer(a:buf)
+  execute 'pyfile '.g:clientPath
+  let a:ret = cursor(a:line,a:col)
+  return a:input
     
 endfunc
 
