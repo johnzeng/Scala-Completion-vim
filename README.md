@@ -4,7 +4,7 @@ Still very buggy scala vim completion plugin based on [Scala-completion-base](ht
 Client-Server Arch completion plugin. It's not working fine now because it will spend lots of time to wait until the compile is finished.
 
 # screen cast
-![testing](https://github.com/johnzeng/Images/blob/master/scala-complete-vim/V1.mp4)
+![testing](https://github.com/johnzeng/Images/blob/master/scala-complete-vim/V1.gif)
 
 # Currently supported feature
 - completion for symbol(even those from implicit conversions)
