@@ -26,9 +26,11 @@ else:
             "line":vim.eval('a:line'),
             "col":vim.eval('a:col'),
             "filename":vim.eval('a:bufFile'),
-            "oname":"test",
+            "oname":vim.eval('expand("%:t")')
             }
     paramsStr = urllib.urlencode(params)
+
+    vim.command('echom "%s"' % paramsStr)
 
     try:
         vim.command("echom 'now open url'")

@@ -10,14 +10,14 @@ if !exists('g:scala_jar_list')
   let g:scala_jar_list = []
 endif
 
-func! SetupServer()
+func! s:SetupServer()
   let a:isSetup=1
   let a:pyfilePath = s:pluginPath.''
   exec 'pyfile '.g:clientPath
 endfunc
 
-call SetupServer()
 
+call s:SetupServer()
 imap . <C-r>=scala#precompile('.')<CR>
 "inoremap <buffer> <Space> <C-r>=scala#precompile(' ')<CR>
 func! ScalaComplete(findstart, base)

@@ -46,12 +46,18 @@ func! scala#complete(findstart,base)
       echom a:out
       return -3
     endif
+    let a:matchScope = 0
     for i in range(len(a:outList))
       if a:outList[i] == "Scope{"
-        let a:start = i
+        let a:matchScope = a:matchScope + 1
+        if a:matchScope == 1 && !exists('a:start')
+          let a:start = i
+        endif
       elseif a:outList[i] == "}"
-        let a:end = i
-        break
+        let a:matchScope = a:matchScope - 1
+        if a:matchScope == 0
+          let a:end = i
+        endif
       endif
     endfor
 
@@ -65,7 +71,7 @@ func! scala#complete(findstart,base)
     let a:retDicList = []
     for i in range(len(s:retList))
       let a:info = s:retList[i]
-      if match(a:info, "\^\\s\*private") == 0 || match(a:info, "\^\\s\*protected") == 0
+      if match(a:info, "\^\\s\*private") == 0 || match(a:info, "\^\\s\*protected") == 0 ||match(a:info, "\^Scope{") == 0 || match(a:info, "\^}") == 0 
         continue
       endif
 
@@ -77,7 +83,9 @@ func! scala#complete(findstart,base)
       let a:shortWord = substitute(a:shortWord, "def ","","")
       let a:shortWord = substitute(a:shortWord, "extend ","","")
       let a:shortWord = substitute(a:shortWord, "override ","","")
+      let a:shortWord = substitute(a:shortWord, "<.*>","","")
       let a:shortWord = substitute(a:shortWord, "[ ;]","","g")
+      let a:shortWord = substitute(a:shortWord, "^\$","","g")
 
       let a:comWord = substitute(a:shortWord, "\[[(:\].*","","")
       if a:comWord =~ '^'.a:base

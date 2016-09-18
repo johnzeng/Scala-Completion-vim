@@ -23,21 +23,13 @@ object Test {
   hello.newget
   val b = Seq(1,1)
   val c = b.map(a => a+1)
-
-//  val issuer = "https://mydomain.com/"
-//  val secret = "ababa"
-//
-//  val iat = System.currentTimeMillis() / 1000l // issued at claim 
-//  val exp = iat + 60l // expires claim. In this case the token expires in 60 seconds
-//
-//  val signer = new JWTSigner(secret)
-//  val claims = new HashMap[String, Object]()
-//  claims.put("iss", issuer)
-//  claims.put("exp", exp)
-//  claims.put("iat", iat)
-
-//  val jwt = signer.sign(claims)
-//
-//
  
+  implicit class ImplicitGet(s:String){
+    def implicitGetTest() = 123
+  }
+  
+  implicit def implicitStr2int(str:String) = new MyTest()
+  "hello".newget()
+
 }
+
